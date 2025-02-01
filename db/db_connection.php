@@ -1,9 +1,9 @@
 <?php
 // Database connection configuration
 $host = 'localhost'; // Replace with your MySQL host, e.g., '127.0.0.1'
-$dbName = 'aibotrade'; // Replace with your database name
-$username = 'root'; // Replace with your MySQL username
-$password = ''; // Replace with your MySQL password
+$dbName = 'mfyokfmh_aibot'; // Replace with your database name
+$username = 'mfyokfmh_aibot'; // Replace with your MySQL username
+$password = 'aibot123@'; // Replace with your MySQL password
 
 try {
     // Create a new PDO connection
