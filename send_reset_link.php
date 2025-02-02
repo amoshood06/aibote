@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$email, $token, $token]);
 
         // Create Reset Link
-        $resetLink = "https://yourwebsite.com/reset_password.php?token=$token";
+        $resetLink = "https://bothighstock.com/reset_password.php?token=$token";
 
         // Send Email
         sendEmail($email, "Password Reset", "
@@ -41,14 +41,14 @@ function sendEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
+        $mail->Host       = 'mail.bothighstock.com'; // Use correct SMTP server
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME');
-        $mail->Password   = getenv('SMTP_PASSWORD');
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $mail->Username   = 'noreply@bothighstock.com'; // Correct email
+        $mail->Password   = 'AjoseKola123'; // Directly assigned (Consider using an environment variable)
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // Use SSL
+        $mail->Port       = 465; // Use correct SMTP port
 
-        $mail->setFrom('your-email@gmail.com', 'Your Website');
+        $mail->setFrom('noreply@bothighstock.com', 'Bothigh Stock');
         $mail->addAddress($to);
         $mail->isHTML(true);
         $mail->Subject = $subject;
