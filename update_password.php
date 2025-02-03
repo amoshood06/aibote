@@ -3,27 +3,39 @@ include './db/db_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $token = $_POST['token'];
-    $newPassword = password_hash($_POST['password'], PASSWORD_BCRYPT);
+    $password = $_POST['password'];
+    $confirmPassword = $_POST['confirm-password'];
 
-    // Get user email from token
+    // Check if passwords match
+    if ($password !== $confirmPassword) {
+        die("Error: Passwords do not match!");
+    }
+
+    // Ensure password is secure
+    if (strlen($password) < 8) {
+        die("Error: Password must be at least 8 characters long!");
+    }
+
+    // Fetch email from password_resets table
     $stmt = $pdo->prepare("SELECT email FROM password_resets WHERE token = ?");
     $stmt->execute([$token]);
     $reset = $stmt->fetch();
 
     if (!$reset) {
-        die("Invalid Token!");
+        die("Error: Invalid or expired token!");
     }
 
     $email = $reset['email'];
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-    // Update password
+    // Update user password
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
-    $stmt->execute([$newPassword, $email]);
+    $stmt->execute([$hashedPassword, $email]);
 
-    // Delete the token
-    $stmt = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
-    $stmt->execute([$email]);
+    // Delete the reset token after successful reset
+    $stmt = $pdo->prepare("DELETE FROM password_resets WHERE token = ?");
+    $stmt->execute([$token]);
 
-    echo "Password reset successfully. You can now <a href='login.php'>login</a>.";
+    echo "Password successfully updated! You can now <a href='login.php'>log in</a>.";
 }
 ?>
