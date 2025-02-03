@@ -14,10 +14,20 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 // Ensure referral_code is set before using it
-$referral_code = isset($user['referral_code']) ? $user['referral_code'] : '';
+$referral_code = isset($user['referral_code']) ? trim($user['referral_code']) : '';
 
-$welcome_message = isset($_SESSION['welcome_message']) ? $_SESSION['welcome_message'] : '';
-unset($_SESSION['welcome_message']); // Remove after displaying
+// Debugging: Check if referral code is being fetched correctly
+if (empty($referral_code)) {
+    echo "Referral code is missing.";
+} else {
+    echo "Referral Code: " . htmlspecialchars($referral_code); // Securely display referral code
+}
+
+// Generate referral link
+$referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
+
+// Display the referral link (for debugging)
+echo "<br>Referral Link: " . $referral_link;
 
 // Fetch daily returns
 $sql = "SELECT dr.*, u.full_name, i.amount 
@@ -52,12 +62,8 @@ $successfulTrades = $successfulTradesStmt->fetch(PDO::FETCH_ASSOC)['successful_t
 // Calculate win rate
 $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 0;
 
-// Generate referral link
-$referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . $referral_code : '#';
-
-// Debugging: Check if referral code is being fetched correctly
-echo "Referral Code: " . $referral_code;
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" class="dark">
