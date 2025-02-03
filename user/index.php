@@ -211,7 +211,7 @@ $referral_link = "https://bothighstock.com/register.php?ref=" . $user['referral_
                         </div>
                         <div>
                         <p>Share your referral link:</p>
-                        <input type="text" value="<?php echo $referral_link; ?>" readonly>
+                        <input type="text" value="<?php echo $referral_link; ?>" disabled>
                         <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded" onclick="copyReferral()">Copy Link</button>
                         </div>
                     </div>
