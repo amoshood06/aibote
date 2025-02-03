@@ -1,6 +1,6 @@
 <?php
 // Database connection configuration
-$host = 'localhost'; // Replace with your MySQL host, e.g., '127.0.0.1'
+$host = '3306'; // Replace with your MySQL host, e.g., '127.0.0.1'
 $dbName = 'mfyokfmh_aibot'; // Replace with your database name
 $username = 'mfyokfmh_aibot'; // Replace with your MySQL username
 $password = 'aibot123@'; // Replace with your MySQL password
