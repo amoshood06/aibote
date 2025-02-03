@@ -1,5 +1,5 @@
 <?php
-include '../db/db_connection.php';
+include './db/db_connection.php';
 
 if (!isset($_GET['token'])) {
     die("Invalid Token!");
