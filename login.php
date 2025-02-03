@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
                             <button class="flex-1 flex items-center justify-center gap-2 border border-gray-200 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl hover:bg-gray-50 transition text-sm sm:text-base">
-                                <a href="{{url('forgot_password')}}">
+                                <a href="forgot_password.php">
                                 <i class="fab fa-lock"></i>
                                 Forget Password
                                 </a>
