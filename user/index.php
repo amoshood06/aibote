@@ -219,9 +219,9 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
                             </select>
                         </div>
                         <div>
-                        <p>Share your referral link:</p>
-                        <input type="text" value="<?php echo $referral_link; ?>" disabled>
-                        <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded" onclick="copyReferral()">Copy Link</button>
+                            <p>Share your referral link:</p>
+                            <input id="referralLink" type="text" value="<?php echo $referral_link; ?>" disabled>
+                            <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded" onclick="copyReferral()">Copy Link</button>
                         </div>
                     </div>
                 </div>
@@ -280,12 +280,21 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
     <?php endif; ?>
     </script>
     <script>
-    function copyReferral() {
-        var copyText = document.querySelector("input");
-        copyText.select();
-        document.execCommand("copy");
-        alert("Referral link copied!");
-    }
+        function copyReferral() {
+            var copyText = document.getElementById("referralLink");
+
+            // Ensure the text is selected correctly
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // For mobile devices
+
+            // Try to execute the copy command, and handle any errors
+            try {
+                document.execCommand("copy");
+                alert("Referral link copied!");
+            } catch (err) {
+                alert("Oops! Unable to copy the link.");
+            }
+        }
     </script>
 </body>
 </html>
