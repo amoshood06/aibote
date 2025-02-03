@@ -1,16 +1,20 @@
 <?php
 session_start();
 include('../db/db_connection.php');
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit();
 }
 
-// Fetch user balance
+// Fetch user details including balance and referral code
 $user_id = $_SESSION['user_id'];
-$stmt = $pdo->prepare("SELECT full_name, balance FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT full_name, balance, referral_code FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
+
+// Ensure referral_code is set before using it
+$referral_code = isset($user['referral_code']) ? $user['referral_code'] : '';
 
 $welcome_message = isset($_SESSION['welcome_message']) ? $_SESSION['welcome_message'] : '';
 unset($_SESSION['welcome_message']); // Remove after displaying
@@ -26,7 +30,6 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $dailyReturns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 // Calculate total investment
 $totalInvestmentStmt = $pdo->prepare("SELECT SUM(amount) AS total_investment FROM investments WHERE user_id = ?");
 $totalInvestmentStmt->execute([$user_id]);
@@ -37,7 +40,7 @@ $totalProfitStmt = $pdo->prepare("SELECT SUM(return_amount) AS total_profit FROM
 $totalProfitStmt->execute([$user_id]);
 $totalProfit = $totalProfitStmt->fetch(PDO::FETCH_ASSOC)['total_profit'];
 
-// Calculate total trades and successful trades (where return_amount > 0)
+// Calculate total trades and successful trades
 $totalTradesStmt = $pdo->prepare("SELECT COUNT(*) AS total_trades FROM daily_returns WHERE user_id = ?");
 $totalTradesStmt->execute([$user_id]);
 $totalTrades = $totalTradesStmt->fetch(PDO::FETCH_ASSOC)['total_trades'];
@@ -49,13 +52,13 @@ $successfulTrades = $successfulTradesStmt->fetch(PDO::FETCH_ASSOC)['successful_t
 // Calculate win rate
 $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 0;
 
+// Generate referral link
+$referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . $referral_code : '#';
 
-$stmt = $pdo->prepare("SELECT referral_code FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
-
-$referral_link = "https://bothighstock.com/register.php?ref=" . $user['referral_code'];
+// Debugging: Check if referral code is being fetched correctly
+// echo "Referral Code: " . $referral_code;
 ?>
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
