@@ -56,7 +56,7 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
 $referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . $referral_code : '#';
 
 // Debugging: Check if referral code is being fetched correctly
-// echo "Referral Code: " . $referral_code;
+echo "Referral Code: " . $referral_code;
 ?>
 
 <!DOCTYPE html>
