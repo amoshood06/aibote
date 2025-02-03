@@ -48,6 +48,13 @@ $successfulTrades = $successfulTradesStmt->fetch(PDO::FETCH_ASSOC)['successful_t
 
 // Calculate win rate
 $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 0;
+
+
+$stmt = $pdo->prepare("SELECT referral_code FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
+
+$referral_link = "https://bothighstock.com/register.php?ref=" . $user['referral_code'];
 ?>
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -203,12 +210,10 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-1">Risk Level</label>
-                            <input type="range" min="1" max="10" value="5" class="w-full">
+                        <p>Share your referral link:</p>
+                        <input type="text" value="<?php echo $referral_link; ?>" readonly>
+                        <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded" onclick="copyReferral()">Copy Link</button>
                         </div>
-                        <button class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded">
-                            Start Trading
-                        </button>
                     </div>
                 </div>
                 <div class="bg-gray-800 rounded-lg shadow-xl p-4 sm:p-6">
@@ -264,6 +269,14 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
     <?php if ($welcome_message): ?>
         toastr.success("<?= $welcome_message ?>");
     <?php endif; ?>
+    </script>
+    <script>
+    function copyReferral() {
+        var copyText = document.querySelector("input");
+        copyText.select();
+        document.execCommand("copy");
+        alert("Referral link copied!");
+    }
     </script>
 </body>
 </html>
