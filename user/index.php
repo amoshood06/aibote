@@ -20,14 +20,14 @@ $referral_code = isset($user['referral_code']) ? trim($user['referral_code']) : 
 if (empty($referral_code)) {
     echo "Referral code is missing.";
 } else {
-    echo "Referral Code: " . htmlspecialchars($referral_code); // Securely display referral code
+    //echo "Referral Code: " . htmlspecialchars($referral_code); // Securely display referral code
 }
 
 // Generate referral link
 $referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
 
 // Display the referral link (for debugging)
-echo "<br>Referral Link: " . $referral_link;
+//echo "<br>Referral Link: " . $referral_link;
 
 // Fetch daily returns
 $sql = "SELECT dr.*, u.full_name, i.amount 
