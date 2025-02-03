@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <p>If you did not request this, please ignore this email.</p>
                 <p>Best Regards,<br>Bothigh Stock Team</p>
             ")) {
-                echo "A password reset link has been sent to your email.";
+                header("Location: check-email.php");
             } else {
                 echo "Failed to send email. Please try again later.";
             }
