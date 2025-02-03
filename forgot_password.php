@@ -10,7 +10,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#7C3AED' // Purple color from the design
+                        primary: '#FBBF24' // Purple color from the design
                     }
                 }
             }
