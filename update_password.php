@@ -36,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $pdo->prepare("DELETE FROM password_resets WHERE token = ?");
     $stmt->execute([$token]);
 
-    echo "Password successfully updated! You can now <a href='login.php'>log in</a>.";
+    //echo "Password successfully updated! You can now <a href='login.php'>log in</a>.";
+    header("Location: password-reset-success.php");
 }
 ?>
