@@ -1,13 +1,13 @@
 <?php
 // Database connection configuration
-$host = 'localhost'; // Replace with your MySQL host, e.g., '127.0.0.1'
+$host = ''; // Replace with your MySQL host, e.g., '127.0.0.1'
 $dbName = 'mfyokfmh_aibot'; // Replace with your database name
 $username = 'mfyokfmh_aibot'; // Replace with your MySQL username
 $password = 'mfyokfmh_aibot'; // Replace with your MySQL password
 
 try {
     // Create a new PDO connection
-    $pdo = new PDO("mysql:host=$host;dbname=$dbName", $username, $password);
+    $pdo = new PDO("mysql:host =$host;dbname=$dbName", $username, $password);
 
     // Set PDO error mode to exception
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
