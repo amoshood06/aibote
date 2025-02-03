@@ -10,7 +10,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#7C3AED' // Purple color from the design
+                        primary: '#FBBF24' // Purple color from the design
                     }
                 }
             }
@@ -28,18 +28,24 @@
             </div>
             
             <h2 class="text-2xl font-semibold text-gray-900">Check your email</h2>
-            <p class="mt-2 text-gray-600">We sent a password reset link to<br/>olivia@untitledui.com</p>
+            <p class="mt-2 text-gray-600">We sent a password reset link to<br/>your email</p>
         </div>
 
-        <button class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        <button 
+            onclick="window.location.href='mailto:'" 
+            class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
             Open email app
         </button>
 
+
         <div class="text-center text-sm">
             <span class="text-gray-600">Didn't receive the email?</span>
-            <button class="text-primary hover:text-primary/90 font-medium ml-1">
-                Click to resend
-            </button>
+            <a href="forgot_password.php">
+                <button class="text-primary hover:text-primary/90 font-medium ml-1">
+                    Click to resend
+                </button>
+            </a>
+            
         </div>
 
         <div class="text-center">
