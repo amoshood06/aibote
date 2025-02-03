@@ -65,8 +65,8 @@ function sendEmail($to, $subject, $body) {
         $mail->isSMTP();
         $mail->Host       = 'mail.bothighstock.com'; // SMTP server
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('noreply@bothighstock.com'); // Use environment variable
-        $mail->Password   = getenv('AjoseKola123@'); // Use environment variable
+        $mail->Username   = 'noreply@bothighstock.com'; // Your email
+        $mail->Password   = 'AjoseKola123@'; // Use your actual email password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // SSL encryption
         $mail->Port       = 465;
 
@@ -78,7 +78,7 @@ function sendEmail($to, $subject, $body) {
 
         return $mail->send();
     } catch (Exception $e) {
-        error_log("Email could not be sent to $to. Error: {$mail->ErrorInfo}");
+        error_log("Email could not be sent to $to. Error: " . $mail->ErrorInfo);
         return false;
     }
 }
