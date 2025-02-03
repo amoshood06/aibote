@@ -66,7 +66,7 @@ function sendEmail($to, $subject, $body) {
         $mail->Host       = 'mail.bothighstock.com'; // SMTP server
         $mail->SMTPAuth   = true;
         $mail->Username   = getenv('noreply@bothighstock.com'); // Use environment variable
-        $mail->Password   = getenv('AjoseKola123'); // Use environment variable
+        $mail->Password   = getenv('AjoseKola123@'); // Use environment variable
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS; // SSL encryption
         $mail->Port       = 465;
 
