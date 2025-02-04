@@ -133,7 +133,7 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
     <main class="container mx-auto px-4 sm:px-6 py-8">
         <div class="grid md:grid-cols-3 gap-6">
             <div class="md:col-span-2">
-                <div class="chat-mobile bg-gray-800 h-[450px]pb-[70px] rounded-lg shadow-xl pt-4 pl-4 pr-4 sm:p-6 mb-6">
+                <div class="chat-mobile bg-gray-800 h-[450px] pb-[70px] rounded-lg shadow-xl pt-4 pl-4 pr-4 sm:p-6 mb-6">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl sm:text-2xl font-bold">Trading Chart</h2>
                     </div>
