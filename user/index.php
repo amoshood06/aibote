@@ -71,6 +71,7 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Trade Bot</title>
+    <link rel="stylesheet" href="../css/dashboard.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -137,7 +138,7 @@ $winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 
                         <h2 class="text-xl sm:text-2xl font-bold">Trading Chart</h2>
                     </div>
                     <!-- TradingView Widget BEGIN -->
-                     <div style="width: 100%; height: 90%;">
+                     <div class="chat-mobile" style="width: 100%; height: 90%;">
                     <div class="tradingview-widget-container w-full h-64 sm:h-96 rounded-lg mb-4">
                         <div class="tradingview-widget-container__widget h-full w-full"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
