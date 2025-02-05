@@ -19,12 +19,13 @@ $current_balance = $user['balance'];
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate investment input
     $investment = filter_input(INPUT_POST, 'investment', FILTER_VALIDATE_FLOAT);
 
     if ($investment === false || $investment < 1000) {
         $message = "<p class='text-red-500'>Invalid amount! Enter between $1,000 - $100,000.</p>";
     } else {
-        // Determine Investment Plan
+        // Determine Investment Plan based on the amount
         if ($investment >= 1000 && $investment <= 10000) {
             $plan_name = "Starter Portfolio";
             $weekly_return = $investment * (2.5 / 100);
@@ -38,27 +39,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $message = "<p class='text-red-500'>Maximum investment limit is $100,000.</p>";
         }
 
-        if (!isset($message)) { // Continue only if no error
+        if (!isset($message)) { // Only continue if no error has occurred
             if ($current_balance >= $investment) {
-                // Deduct from user balance
+                // Deduct the investment amount from the user's balance
                 $new_balance = $current_balance - $investment;
-                $update_sql = "UPDATE users SET balance = ? WHERE id = ?";
-                $stmt = $pdo->prepare($update_sql);
-                $stmt->execute([$new_balance, $user_id]);
+                try {
+                    $update_sql = "UPDATE users SET balance = ? WHERE id = ?";
+                    $stmt = $pdo->prepare($update_sql);
+                    $stmt->execute([$new_balance, $user_id]);
 
-                // Set start date & end date (30 days from start)
-                $start_date = date('Y-m-d');
-                $end_date = date('Y-m-d', strtotime('+30 days'));
+                    // Set start and end dates for the investment
+                    $start_date = date('Y-m-d');
+                    $end_date = date('Y-m-d', strtotime('+30 days'));
 
-                // Insert investment record
-                $insert_sql = "INSERT INTO investments (user_id, plan_name, amount, weekly_return, start_date, end_date) 
-                               VALUES (?, ?, ?, ?, ?, ?)";
-                $stmt = $pdo->prepare($insert_sql);
-                $stmt->execute([$user_id, $plan_name, $investment, $weekly_return, $start_date, $end_date]);
+                    // Insert investment record into the investments table
+                    $insert_sql = "INSERT INTO investments (user_id, plan_name, amount, weekly_return, start_date, end_date) 
+                                   VALUES (?, ?, ?, ?, ?, ?)";
+                    $stmt = $pdo->prepare($insert_sql);
+                    $stmt->execute([$user_id, $plan_name, $investment, $weekly_return, $start_date, $end_date]);
 
-                $_SESSION['success_message'] = "Investment successful! Weekly Return: $$weekly_return. Ends on $end_date";
-                header("Location: investment.php");
-                exit();
+                    // Success message
+                    $_SESSION['success_message'] = "Investment successful! Weekly Return: $$weekly_return. Ends on $end_date";
+                    header("Location: investment.php");
+                    exit();
+                } catch (Exception $e) {
+                    // Handle any errors that occur during the database operations
+                    $message = "<p class='text-red-500'>Error: " . $e->getMessage() . "</p>";
+                    error_log($e->getMessage()); // Log the error message for further debugging
+                }
             } else {
                 $message = "<p class='text-red-500'>Insufficient balance. Please deposit more funds.</p>";
             }
@@ -66,7 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -101,6 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <?php
+            // Define the investment plans
             $plans = [
                 ["Starter Portfolio", 1000, 10000, 2.5],
                 ["Growth Portfolio", 10000, 50000, 4],
@@ -108,6 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 ["Premium Portfolio", 100000, 999999999, 8]
             ];
 
+            // Display each investment plan
             foreach ($plans as $plan):
             ?>
                 <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg mb-8 mx-auto">
@@ -125,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             <?php endforeach; ?>
 
-            <!-- Message Display -->
+            <!-- Display error or success messages -->
             <?php if (!empty($message)): ?>
                 <div class="mt-8 text-center text-red-500 font-bold">
                     <?= htmlspecialchars($message) ?>
