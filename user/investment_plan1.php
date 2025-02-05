@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($investment === false || $investment < 1000) {
         $message = "<p class='text-red-500'>Invalid amount! Enter between $1,000 - $100,000.</p>";
     } else {
+        // Determine Investment Plan
         if ($investment >= 1000 && $investment <= 10000) {
             $plan_name = "Starter Portfolio";
             $weekly_return = $investment * (2.5 / 100);
@@ -34,32 +35,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $plan_name = "Advanced Portfolio";
             $weekly_return = $investment * (6 / 100);
         } else {
-            $plan_name = "Premium Portfolio";
-            $weekly_return = $investment * (8 / 100);
+            $message = "<p class='text-red-500'>Maximum investment limit is $100,000.</p>";
         }
 
-        if ($current_balance >= $investment) {
-            // Deduct from user balance
-            $new_balance = $current_balance - $investment;
-            $update_sql = "UPDATE users SET balance = ? WHERE id = ?";
-            $stmt = $pdo->prepare($update_sql);
-            $stmt->execute([$new_balance, $user_id]);
+        if (!isset($message)) { // Continue only if no error
+            if ($current_balance >= $investment) {
+                // Deduct from user balance
+                $new_balance = $current_balance - $investment;
+                $update_sql = "UPDATE users SET balance = ? WHERE id = ?";
+                $stmt = $pdo->prepare($update_sql);
+                $stmt->execute([$new_balance, $user_id]);
 
-            // Insert investment record
-            $insert_sql = "INSERT INTO investments (user_id, plan_name, amount, weekly_return) VALUES (?, ?, ?, ?)";
-            $stmt = $pdo->prepare($insert_sql);
-            $stmt->execute([$user_id, $plan_name, $investment, $weekly_return]);
+                // Set start date & end date (30 days from start)
+                $start_date = date('Y-m-d');
+                $end_date = date('Y-m-d', strtotime('+30 days'));
 
-            $_SESSION['success_message'] = "Investment successful! Weekly Return: $$weekly_return";
-            header("Location: investment.php");
-            exit();
-        } else {
-            header("Location: deposit.php?error=low_balance");
-            exit();
+                // Insert investment record
+                $insert_sql = "INSERT INTO investments (user_id, plan_name, amount, weekly_return, start_date, end_date) 
+                               VALUES (?, ?, ?, ?, ?, ?)";
+                $stmt = $pdo->prepare($insert_sql);
+                $stmt->execute([$user_id, $plan_name, $investment, $weekly_return, $start_date, $end_date]);
+
+                $_SESSION['success_message'] = "Investment successful! Weekly Return: $$weekly_return. Ends on $end_date";
+                header("Location: investment.php");
+                exit();
+            } else {
+                $message = "<p class='text-red-500'>Insufficient balance. Please deposit more funds.</p>";
+            }
         }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -107,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h3 class="text-2xl font-semibold text-gray-700 mb-4"><?= htmlspecialchars($plan[0]) ?></h3>
                     <p class="text-gray-600 mb-4">Investment: $<?= number_format($plan[1]) ?> - $<?= number_format($plan[2]) ?></p>
                     <p class="text-gray-600 mb-4">Weekly Return: <?= $plan[3] ?>%</p>
-                    <form method="POST">
+                    <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="POST">
                         <input type="number" name="investment" min="<?= $plan[1] ?>" max="<?= $plan[2] ?>" step="100" required
                             class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                             placeholder="Enter investment amount">

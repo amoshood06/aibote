@@ -1,11 +1,15 @@
 <?php
 include '../db/db_connection.php';
 
-// Get all active investments
-$sql = "SELECT investments.id, investments.user_id, investments.weekly_return, users.balance 
+$current_date = date('Y-m-d');
+
+// Get all active investments that have not expired
+$sql = "SELECT investments.id, investments.user_id, investments.weekly_return, investments.end_date, users.balance 
         FROM investments 
-        JOIN users ON investments.user_id = users.id";
-$stmt = $pdo->query($sql);
+        JOIN users ON investments.user_id = users.id
+        WHERE investments.end_date >= ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$current_date]);
 $investments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 foreach ($investments as $investment) {
