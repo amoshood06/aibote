@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate investment input
     $investment = filter_input(INPUT_POST, 'investment', FILTER_VALIDATE_FLOAT);
 
-    if ($investment === false || $investment < 1000) {
+    if ($investment === false || $investment < 1000 || $investment > 100000) {
         $message = "<p class='text-red-500'>Invalid amount! Enter between $1,000 - $100,000.</p>";
     } else {
         // Determine Investment Plan based on the amount
@@ -36,14 +36,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $plan_name = "Advanced Portfolio";
             $weekly_return = $investment * (6 / 100);
         } else {
-            $message = "<p class='text-red-500'>Maximum investment limit is $100,000.</p>";
+            $plan_name = null;
         }
 
-        if (!isset($message)) { // Only continue if no error has occurred
+        if ($plan_name !== null) {
             if ($current_balance >= $investment) {
-                // Deduct the investment amount from the user's balance
-                $new_balance = $current_balance - $investment;
                 try {
+                    // Start Transaction
+                    $pdo->beginTransaction();
+
+                    // Deduct balance
+                    $new_balance = $current_balance - $investment;
                     $update_sql = "UPDATE users SET balance = ? WHERE id = ?";
                     $stmt = $pdo->prepare($update_sql);
                     $stmt->execute([$new_balance, $user_id]);
@@ -58,22 +61,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt = $pdo->prepare($insert_sql);
                     $stmt->execute([$user_id, $plan_name, $investment, $weekly_return, $start_date, $end_date]);
 
+                    // Commit Transaction
+                    $pdo->commit();
+
                     // Success message
                     $_SESSION['success_message'] = "Investment successful! Weekly Return: $$weekly_return. Ends on $end_date";
                     header("Location: investment.php");
                     exit();
                 } catch (Exception $e) {
-                    // Handle any errors that occur during the database operations
+                    $pdo->rollBack(); // Rollback transaction if error occurs
                     $message = "<p class='text-red-500'>Error: " . $e->getMessage() . "</p>";
-                    error_log($e->getMessage()); // Log the error message for further debugging
+                    error_log($e->getMessage()); // Log the error
                 }
             } else {
                 $message = "<p class='text-red-500'>Insufficient balance. Please deposit more funds.</p>";
             }
+        } else {
+            $message = "<p class='text-red-500'>Invalid investment plan. Please enter a valid amount.</p>";
         }
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en" class="dark">
@@ -93,6 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <a href="#" class="hover:text-primary-400">Trades</a>
                     <a href="#" class="hover:text-primary-400">Deposit</a>
                     <a href="investment.php" class="hover:text-primary-400">Investment Plan</a>
+                    <a href="transaction.php" class="hover:text-primary-400">Transaction</a>
                     <a href="#" class="hover:text-primary-400">Settings</a>
                     <a href="logout.php" class="inline-flex items-center justify-center rounded-full bg-[#FBC531] px-4 py-2 text-sm font-medium text-black hover:bg-neon/90">Logout</a>
                 </div>
