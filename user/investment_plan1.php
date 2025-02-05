@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h3 class="text-2xl font-semibold text-gray-700 mb-4"><?= htmlspecialchars($plan[0]) ?></h3>
                     <p class="text-gray-600 mb-4">Investment: $<?= number_format($plan[1]) ?> - $<?= number_format($plan[2]) ?></p>
                     <p class="text-gray-600 mb-4">Weekly Return: <?= $plan[3] ?>%</p>
-                    <form action="<?php echo $_SERVER['PHP_SELF'];?>" method="POST">
+                    <form  method="POST">
                         <input type="number" name="investment" min="<?= $plan[1] ?>" max="<?= $plan[2] ?>" step="100" required
                             class="w-full p-3 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
                             placeholder="Enter investment amount">
