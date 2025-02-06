@@ -167,7 +167,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                                 </path><path d="M4 17h16"></path>
                             </svg>
                         </div>
-                        <span class="text-sm">Transfer</span>
+                        <span class="text-sm">Trade</span>
                     </button>
                     <button class="flex flex-col items-center gap-2">
                         <div class="bg-zinc-800 p-3 rounded-xl">
@@ -175,7 +175,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                                 <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
                                 <path d="M21 3v5h-5"></path>
                                 <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                                <path d="M8 16H3v5"></path></svg></div><span class="text-sm">Convert</span>
+                                <path d="M8 16H3v5"></path></svg></div><span class="text-sm">History</span>
                             </button>
                         </div>
                         <div dir="ltr" data-orientation="horizontal" class="p-4">
