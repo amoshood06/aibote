@@ -1,12 +1,18 @@
 <?php
+// Start the session
 session_start();
+
+// Include the database connection file
 include('../db/db_connection.php');
 
+// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
+    // If not logged in, redirect to the login page
     header("Location: ../login.php");
     exit();
 }
 
+// Get the user ID from the session
 $user_id = $_SESSION['user_id'];
 
 // Fetch user details including balance and referral code
@@ -23,6 +29,7 @@ function getBtcRate() {
     $cache_file = "btc_rate_cache.json"; // Cache file location
     $cache_time = 300; // 5 minutes (300 seconds)
 
+    // Check if the cache file exists and is still valid
     if (file_exists($cache_file) && (time() - filemtime($cache_file)) < $cache_time) {
         // Use cached BTC rate if it's still valid
         $cached_data = json_decode(file_get_contents($cache_file), true);
@@ -33,6 +40,7 @@ function getBtcRate() {
     $api_url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
     $response = @file_get_contents($api_url);
 
+    // Check if the API response is valid
     if ($response !== false) {
         $data = json_decode($response, true);
         $btc_rate = $data['bitcoin']['usd'] ?? 0;
@@ -52,6 +60,7 @@ $btc_rate = getBtcRate();
 // Convert user's balance (USD) to BTC
 $user_balance = $user['balance'] ?? 0;
 $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
+
 ?>
 
 
