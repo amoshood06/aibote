@@ -1,66 +1,45 @@
 <?php
-// Start the session
 session_start();
-
-// Include the database connection file
 include('../db/db_connection.php');
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    // If not logged in, redirect to the login page
     header("Location: ../login.php");
     exit();
 }
 
-// Get the user ID from the session
 $user_id = $_SESSION['user_id'];
 
-// Fetch user details including balance and referral code
-$stmt = $pdo->prepare("SELECT full_name, balance, referral_code FROM users WHERE id = ?");
+// Fetch user balance
+$stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
+$user_balance = $user['balance'] ?? 0; // User's balance in USD
 
-// Ensure referral_code is set before using it
-$referral_code = !empty($user['referral_code']) ? trim($user['referral_code']) : '';
-$referral_link = $referral_code ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
-
-// Function to fetch BTC rate from API and cache it
+// Function to fetch BTC rate using cURL
 function getBtcRate() {
-    $cache_file = "btc_rate_cache.json"; // Cache file location
-    $cache_time = 300; // 5 minutes (300 seconds)
-
-    // Check if the cache file exists and is still valid
-    if (file_exists($cache_file) && (time() - filemtime($cache_file)) < $cache_time) {
-        // Use cached BTC rate if it's still valid
-        $cached_data = json_decode(file_get_contents($cache_file), true);
-        return $cached_data['btc_rate'] ?? 0;
-    }
-
-    // Fetch new BTC rate from API
     $api_url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
-    $response = @file_get_contents($api_url);
+    
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $api_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disable SSL verification if needed
 
-    // Check if the API response is valid
+    $response = curl_exec($ch);
+    curl_close($ch);
+
     if ($response !== false) {
         $data = json_decode($response, true);
-        $btc_rate = $data['bitcoin']['usd'] ?? 0;
-
-        // Save new BTC rate to cache file
-        file_put_contents($cache_file, json_encode(['btc_rate' => $btc_rate, 'timestamp' => time()]));
-
-        return $btc_rate;
+        return $data['bitcoin']['usd'] ?? 0;
     }
 
     return 0; // Return 0 if API fails
 }
 
-// Get the latest BTC/USD rate
+// Get BTC/USD rate
 $btc_rate = getBtcRate();
 
-// Convert user's balance (USD) to BTC
-$user_balance = $user['balance'] ?? 0;
+// Convert user balance (USD to BTC)
 $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
-
 ?>
 
 
@@ -81,15 +60,17 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
         <div class="min-h-screen bg-black text-white">
             <div class="flex justify-between items-center p-4">
                 <h1 class="text-xl font-semibold">My Assets</h1>
-                <button class="bg-[#FBC531] pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex rounded-[20px]">
-                    Logout
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-6 h-6">
-                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                        <path d="M21 3v5h-5"></path>
-                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                        <path d="M8 16H3v5"></path>
-                    </svg>
-                </button>
+                <a href="logout.php">
+                    <button class="bg-[#FBC531] pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex rounded-[20px]">
+                        Logout
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-6 h-6">
+                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                            <path d="M21 3v5h-5"></path>
+                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                            <path d="M8 16H3v5"></path>
+                        </svg>
+                    </button>
+                </a>
             </div>
             <div class="p-4 space-y-2">
                 <div class="flex items-center gap-2">
