@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'amount' => $amount,
         'currency' => 'USD',
         'name' => 'User-' . $user_id,
-        'expire_time' => 3600, // 1-hour expiry
-        'notify_url' => 'http://yourwebsite.com/payment_callback.php',
+        'expire_time' => 1440, // 1-hour expiry
+        'notify_url' => 'https://bothighstock.com/payment_callback.php',
     ];
 
     $ch = curl_init('https://coinremitter.com/api/v3/' . strtolower($coin) . '/create-invoice');
