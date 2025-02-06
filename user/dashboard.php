@@ -18,53 +18,42 @@ $user = $stmt->fetch();
 $referral_code = !empty($user['referral_code']) ? trim($user['referral_code']) : '';
 $referral_link = $referral_code ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
 
-// Fetch latest 5 daily returns
-$sql = "SELECT dr.*, u.full_name, i.amount 
-        FROM daily_returns dr
-        JOIN users u ON dr.user_id = u.id
-        JOIN investments i ON dr.investment_id = i.id
-        ORDER BY dr.created_at DESC
-        LIMIT 5";
-$stmt = $pdo->prepare($sql);
-$stmt->execute();
-$dailyReturns = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Function to fetch BTC rate from API and cache it
+function getBtcRate() {
+    $cache_file = "btc_rate_cache.json"; // Cache file location
+    $cache_time = 300; // 5 minutes (300 seconds)
 
-// Calculate total investment
-$totalInvestmentStmt = $pdo->prepare("SELECT SUM(amount) AS total_investment FROM investments WHERE user_id = ?");
-$totalInvestmentStmt->execute([$user_id]);
-$totalInvestment = $totalInvestmentStmt->fetchColumn() ?: 0;
+    if (file_exists($cache_file) && (time() - filemtime($cache_file)) < $cache_time) {
+        // Use cached BTC rate if it's still valid
+        $cached_data = json_decode(file_get_contents($cache_file), true);
+        return $cached_data['btc_rate'] ?? 0;
+    }
 
-// Calculate total profit
-$totalProfitStmt = $pdo->prepare("SELECT SUM(return_amount) AS total_profit FROM daily_returns WHERE user_id = ?");
-$totalProfitStmt->execute([$user_id]);
-$totalProfit = $totalProfitStmt->fetchColumn() ?: 0;
+    // Fetch new BTC rate from API
+    $api_url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
+    $response = @file_get_contents($api_url);
 
-// Calculate total trades and successful trades
-$totalTradesStmt = $pdo->prepare("SELECT COUNT(*) FROM daily_returns WHERE user_id = ?");
-$totalTradesStmt->execute([$user_id]);
-$totalTrades = $totalTradesStmt->fetchColumn() ?: 0;
+    if ($response !== false) {
+        $data = json_decode($response, true);
+        $btc_rate = $data['bitcoin']['usd'] ?? 0;
 
-$successfulTradesStmt = $pdo->prepare("SELECT COUNT(*) FROM daily_returns WHERE user_id = ? AND return_amount > 0");
-$successfulTradesStmt->execute([$user_id]);
-$successfulTrades = $successfulTradesStmt->fetchColumn() ?: 0;
+        // Save new BTC rate to cache file
+        file_put_contents($cache_file, json_encode(['btc_rate' => $btc_rate, 'timestamp' => time()]));
 
-// Calculate win rate
-$winRate = ($totalTrades > 0) ? round(($successfulTrades / $totalTrades) * 100) : 0;
+        return $btc_rate;
+    }
 
-// Fetch BTC/USD exchange rate with error handling
-$btc_rate = 0;
-$api_url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
-
-$response = @file_get_contents($api_url);
-if ($response !== false) {
-    $data = json_decode($response, true);
-    $btc_rate = $data['bitcoin']['usd'] ?? 0;
+    return 0; // Return 0 if API fails
 }
 
-// Convert USD balance to BTC
+// Get the latest BTC/USD rate
+$btc_rate = getBtcRate();
+
+// Convert user's balance (USD) to BTC
 $user_balance = $user['balance'] ?? 0;
 $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
 ?>
+
 
 
 
