@@ -7,35 +7,24 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Fetch user details including balance and referral code
 $user_id = $_SESSION['user_id'];
+
+// Fetch user details including balance and referral code
 $stmt = $pdo->prepare("SELECT full_name, balance, referral_code FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 // Ensure referral_code is set before using it
-$referral_code = isset($user['referral_code']) ? trim($user['referral_code']) : '';
+$referral_code = !empty($user['referral_code']) ? trim($user['referral_code']) : '';
+$referral_link = $referral_code ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
 
-// Debugging: Check if referral code is being fetched correctly
-if (empty($referral_code)) {
-    echo "Referral code is missing.";
-} else {
-    //echo "Referral Code: " . htmlspecialchars($referral_code); // Securely display referral code
-}
-
-// Generate referral link
-$referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
-
-// Display the referral link (for debugging)
-//echo "<br>Referral Link: " . $referral_link;
-
-// Fetch daily returns
+// Fetch latest 5 daily returns
 $sql = "SELECT dr.*, u.full_name, i.amount 
         FROM daily_returns dr
         JOIN users u ON dr.user_id = u.id
         JOIN investments i ON dr.investment_id = i.id
         ORDER BY dr.created_at DESC
-        LIMIT 5";  // Fetch only the latest 5 records
+        LIMIT 5";
 $stmt = $pdo->prepare($sql);
 $stmt->execute();
 $dailyReturns = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -43,37 +32,40 @@ $dailyReturns = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Calculate total investment
 $totalInvestmentStmt = $pdo->prepare("SELECT SUM(amount) AS total_investment FROM investments WHERE user_id = ?");
 $totalInvestmentStmt->execute([$user_id]);
-$totalInvestment = $totalInvestmentStmt->fetch(PDO::FETCH_ASSOC)['total_investment'];
+$totalInvestment = $totalInvestmentStmt->fetchColumn() ?: 0;
 
 // Calculate total profit
 $totalProfitStmt = $pdo->prepare("SELECT SUM(return_amount) AS total_profit FROM daily_returns WHERE user_id = ?");
 $totalProfitStmt->execute([$user_id]);
-$totalProfit = $totalProfitStmt->fetch(PDO::FETCH_ASSOC)['total_profit'];
+$totalProfit = $totalProfitStmt->fetchColumn() ?: 0;
 
 // Calculate total trades and successful trades
-$totalTradesStmt = $pdo->prepare("SELECT COUNT(*) AS total_trades FROM daily_returns WHERE user_id = ?");
+$totalTradesStmt = $pdo->prepare("SELECT COUNT(*) FROM daily_returns WHERE user_id = ?");
 $totalTradesStmt->execute([$user_id]);
-$totalTrades = $totalTradesStmt->fetch(PDO::FETCH_ASSOC)['total_trades'];
+$totalTrades = $totalTradesStmt->fetchColumn() ?: 0;
 
-$successfulTradesStmt = $pdo->prepare("SELECT COUNT(*) AS successful_trades FROM daily_returns WHERE user_id = ? AND return_amount > 0");
+$successfulTradesStmt = $pdo->prepare("SELECT COUNT(*) FROM daily_returns WHERE user_id = ? AND return_amount > 0");
 $successfulTradesStmt->execute([$user_id]);
-$successfulTrades = $successfulTradesStmt->fetch(PDO::FETCH_ASSOC)['successful_trades'];
+$successfulTrades = $successfulTradesStmt->fetchColumn() ?: 0;
 
 // Calculate win rate
-$winRate = $totalTrades > 0 ? round(($successfulTrades / $totalTrades) * 100) : 0;
+$winRate = ($totalTrades > 0) ? round(($successfulTrades / $totalTrades) * 100) : 0;
 
-// Fetch real-time BTC/USD exchange rate
+// Fetch BTC/USD exchange rate with error handling
+$btc_rate = 0;
 $api_url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd";
-$response = file_get_contents($api_url);
-$data = json_decode($response, true);
 
-$btc_rate = $data['bitcoin']['usd'] ?? 0; // Get BTC price in USD
-$user_balance = $user['balance']; // User's balance in USD
+$response = @file_get_contents($api_url);
+if ($response !== false) {
+    $data = json_decode($response, true);
+    $btc_rate = $data['bitcoin']['usd'] ?? 0;
+}
 
-// Convert USD to BTC
-$btc_value = $btc_rate > 0 ? $user_balance / $btc_rate : 0;
-
+// Convert USD balance to BTC
+$user_balance = $user['balance'] ?? 0;
+$btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
 ?>
+
 
 
 <!DOCTYPE html>
