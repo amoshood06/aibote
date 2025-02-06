@@ -1,6 +1,8 @@
 <?php
 session_start();
 include '../db/db_connection.php';
+include_once './vendor/autoload.php';
+use CoinRemitter\CoinRemitter;
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
