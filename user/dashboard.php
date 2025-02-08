@@ -10,10 +10,22 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user balance
-$stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT full_name, balance, referral_code FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 $user_balance = $user['balance'] ?? 0; // User's balance in USD
+// Ensure referral_code is set before using it
+$referral_code = isset($user['referral_code']) ? trim($user['referral_code']) : '';
+
+// Debugging: Check if referral code is being fetched correctly
+if (empty($referral_code)) {
+    echo "Referral code is missing.";
+} else {
+    //echo "Referral Code: " . htmlspecialchars($referral_code); // Securely display referral code
+}
+
+// Generate referral link
+$referral_link = !empty($referral_code) ? "https://bothighstock.com/register.php?ref=" . urlencode($referral_code) : '#';
 
 // Function to fetch BTC rate using cURL
 function getBtcRate() {
@@ -145,10 +157,10 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
     <div class="p-4">
         <div class="bg-gradient-to-r from-gray-100 to-gray-300 p-4 rounded-xl flex justify-between items-center">
             <div class="text-black">
-                <div class="font-medium">My Card</div>
-                <div class="text-sm opacity-50">•••• 5967</div>
+                <div class="font-medium">Referral Link</div>
+                <div class="text-sm opacity-50"><?php echo $referral_link; ?></div>
             </div>
-            <img alt="Mastercard" class="h-8" src="/mastercard.svg"></div>
+            <img alt="Mastercard" class="h-8" src="./assets/image/referral.png"></div>
         </div>
         <div class="grid grid-cols-4 gap-4 p-4">
             <button class="flex flex-col items-center gap-2">
@@ -169,12 +181,10 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                     </button>
                     <button class="flex flex-col items-center gap-2">
                         <div class="bg-zinc-800 p-3 rounded-xl">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-refresh-cw w-6 h-6">
-                                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                                <path d="M21 3v5h-5"></path>
-                                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                                <path d="M8 16H3v5"></path></svg></div><span class="text-sm">History</span>
-                            </button>
+                            <img src="../assets/image/history.png" class="w-[24px] h-[24px]" alt="">
+                        </div>
+                        <span class="text-sm">History</span>
+                    </button>
                         </div>
                         <div dir="ltr" data-orientation="horizontal" class="p-4">
                             <div role="tablist" aria-orientation="horizontal" class="inline-flex h-10 items-center rounded-md p-1 text-muted-foreground bg-transparent border-b border-zinc-800 w-full justify-start gap-8" tabindex="0" data-orientation="horizontal" style="outline: none;">
