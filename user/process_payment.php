@@ -59,8 +59,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $paymentAddress = $responseData['pay_address']; 
         $paymentID = $responseData['payment_id']; // Get payment ID from response
 
-        // Insert transaction into database
-        $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, currency, status, txn_id, pay_address, payment_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        // Insert transaction into database using `$pdo`
+        $stmt = $pdo->prepare("INSERT INTO transactions (user_id, amount, currency, status, txn_id, pay_address, payment_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$userID, $amount, "BTC", "waiting", $orderID, $paymentAddress, $paymentID]);
 
         // Redirect user to the BTC payment address
