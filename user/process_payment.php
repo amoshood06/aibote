@@ -2,7 +2,7 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 session_start();
-require "./db/db_connection.php"; 
+require "../db/db_connection.php"; 
 
 if (!isset($_SESSION['user_id'])) {
     die("Session error: User not logged in.");
