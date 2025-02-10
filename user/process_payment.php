@@ -1,10 +1,11 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 require "./db/db_connection.php"; 
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
+    die("Session error: User not logged in.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -38,8 +39,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
     $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     $responseData = json_decode($response, true);
+
+    if ($httpCode != 200) {
+        echo "API Error: HTTP Code " . $httpCode . "<br>";
+        echo "Response: " . $response;
+        exit();
+    }
 
     if (isset($responseData['invoice_url'])) {
         $stmt = $conn->prepare("INSERT INTO transactions (user_id, amount, currency, status, txn_id) VALUES (?, ?, ?, ?, ?)");
@@ -48,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: " . $responseData['invoice_url']);
         exit();
     } else {
-        echo "Error creating payment.";
+        echo "Error creating payment: " . json_encode($responseData);
     }
 }
 ?>
