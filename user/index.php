@@ -212,13 +212,15 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                                     </svg>
                                 <span class="text-xs text-gray-400">Home</span>
                             </button>
-                            <button class="flex flex-col items-center gap-1 py-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-line-chart w-5 h-5 text-gray-400">
-                                    <path d="M3 3v18h18"></path>
-                                    <path d="m19 9-5 5-4-4-3 3"></path>
-                                </svg>
-                                <span class="text-xs text-gray-400">Markets</span>
-                            </button>
+                            <a href="markets.php">
+                                <button class="flex flex-col items-center gap-1 py-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-line-chart w-5 h-5 text-gray-400">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="m19 9-5 5-4-4-3 3"></path>
+                                    </svg>
+                                    <span class="text-xs text-gray-400">Markets</span>
+                                </button>
+                            </a>
                             <button class="flex flex-col items-center gap-1 py-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-left w-5 h-5 text-gray-400">
                                 <path d="m16 3 4 4-4 4"></path>
@@ -237,7 +239,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                                 <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
                                 <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
                             </svg>
-                            <span class="text-xs text-amber-500">Assets</span>
+                            <span class="text-xs text-amber-500">Investment</span>
                         </button>
                     </div>
                 </div>
