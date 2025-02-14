@@ -69,7 +69,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "",
+                url: "process-register.php",
                 data: formData,
                 dataType: "json",
                 success: function (response) {
