@@ -160,7 +160,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                 <div class="font-medium">Referral Link</div>
                 <div class="text-sm opacity-50"><?php echo $referral_link; ?></div>
             </div>
-            <img alt="Mastercard" class="h-8" src="./assets/image/referral.png"></div>
+            <img alt="Mastercard" class="h-8" src="../assets/image/link.png"></div>
         </div>
         <div class="grid grid-cols-4 gap-4 p-4">
             <button class="flex flex-col items-center gap-2">
