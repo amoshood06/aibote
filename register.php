@@ -45,7 +45,8 @@
             </p>
         </form>
     </div>
-
+    <script src="./asset/toast/jquery-3.7.1.min.js"></script>
+    <script src="./asset/toast/toastr.min.js"></script>
     <script>
     function togglePassword() {
         const passwordInput = document.getElementById('password');
