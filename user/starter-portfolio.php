@@ -129,7 +129,7 @@ function calculateReturns($investment, $weeks, $rate) {
         <header class="flex justify-between items-center p-4">
             <h1 class="text-xl font-semibold">Starter Portfolio</h1>
             <div class="flex items-center">
-                <span class="mr-4">Welcome, <?= htmlspecialchars($user['username']) ?></span>
+                <span class="mr-4">Welcome, <?= htmlspecialchars($user['full_name']) ?></span>
                 <form action="logout.php" method="post">
                     <button type="submit" class="bg-[#FBC531] text-black pl-4 pr-4 pt-2 pb-2 rounded-full flex items-center">
                         Logout
