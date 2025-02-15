@@ -24,7 +24,7 @@ try {
     $user_id = $_SESSION['user_id'];
 
     // Prepare SQL statement to select username and balance
-    $stmt = $pdo->prepare("SELECT full_name, balance FROM users WHERE id = :user_id");
+    $stmt = $pdo->prepare("SELECT full_gname, balance FROM users WHERE id = :user_id");
     $stmt->execute(['user_id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -129,7 +129,7 @@ function calculateReturns($investment, $weeks, $rate) {
         <header class="flex justify-between items-center p-4">
             <h1 class="text-xl font-semibold">Starter Portfolio</h1>
             <div class="flex items-center">
-                <span class="mr-4">Welcome, <?= htmlspecialchars($user['full_name']) ?></span>
+                <span class="mr-4">Welcome, <?= htmlspecialchars($user['username']) ?></span>
                 <form action="logout.php" method="post">
                     <button type="submit" class="bg-[#FBC531] text-black pl-4 pr-4 pt-2 pb-2 rounded-full flex items-center">
                         Logout

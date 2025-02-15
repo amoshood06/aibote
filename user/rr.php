@@ -1,190 +1,210 @@
-<?php 
+<?php
 session_start();
-include('../db/db_connection.php');
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
-    exit();
+
+// Database credentials
+$host = 'localhost';
+$dbname = 'mfyokfmh_aibot';
+$db_username = 'mfyokfmh_aibot';
+$db_password = 'mfyokfmh_aibot';
+
+try {
+    // Create PDO instance
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_username, $db_password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Check if user is logged in
+    if (!isset($_SESSION['user_id'])) {
+        header("Location: ./login.php");
+        exit();
+    }
+
+    $user_id = $_SESSION['user_id'];
+
+    // Fetch user details
+    $stmt = $pdo->prepare("SELECT full_name, balance FROM users WHERE id = :user_id");
+    $stmt->execute(['user_id' => $user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        throw new Exception("User not found");
+    }
+
+    // Ensure investments table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS investments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        portfolio_name VARCHAR(100) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        weekly_return_rate DECIMAL(5,2) NOT NULL,
+        investment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )");
+
+    // Portfolio details
+    $portfolio = [
+        'name' => 'Starter Portfolio',
+        'min_investment' => 1000,
+        'max_investment' => 10000,
+        'weekly_return' => 2.5
+    ];
+
+    // Handle investment submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['invest'])) {
+        $investment_amount = floatval($_POST['investmentAmount']);
+
+        // Validate investment amount
+        if ($investment_amount < $portfolio['min_investment'] || $investment_amount > $portfolio['max_investment']) {
+            $error = "Investment amount must be between $" . number_format($portfolio['min_investment']) . " and $" . number_format($portfolio['max_investment']) . ".";
+        } elseif ($investment_amount > $user['balance']) {
+            $error = "Insufficient balance. Please fund your wallet.";
+        } else {
+            // Start transaction
+            $pdo->beginTransaction();
+
+            try {
+                // Insert investment record
+                $stmt = $pdo->prepare("INSERT INTO investments (user_id, portfolio_name, amount, weekly_return_rate) VALUES (:user_id, :portfolio_name, :amount, :weekly_return_rate)");
+                $stmt->execute([
+                    'user_id' => $user_id,
+                    'portfolio_name' => $portfolio['name'],
+                    'amount' => $investment_amount,
+                    'weekly_return_rate' => $portfolio['weekly_return']
+                ]);
+
+                // Deduct amount from user balance
+                $new_balance = $user['balance'] - $investment_amount;
+                $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE id = :user_id");
+                $stmt->execute([
+                    'balance' => $new_balance,
+                    'user_id' => $user_id
+                ]);
+
+                // Commit transaction
+                $pdo->commit();
+
+                // Update user balance for UI
+                $user['balance'] = $new_balance;
+
+                // Success message
+                $success = "Investment of $" . number_format($investment_amount, 2) . " successful!";
+            } catch (Exception $e) {
+                // Rollback in case of failure
+                $pdo->rollBack();
+                $error = "Investment failed: " . $e->getMessage();
+            }
+        }
+    }
+
+    // Fetch investment history
+    $stmt = $pdo->prepare("SELECT amount, investment_date FROM investments WHERE user_id = :user_id ORDER BY investment_date DESC LIMIT 5");
+    $stmt->execute(['user_id' => $user_id]);
+    $investments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+} catch (Exception $e) {
+    die("Error: " . $e->getMessage());
 }
-
-// Fetch user balance
-$user_id = $_SESSION['user_id'];
-$stmt = $pdo->prepare("SELECT full_name, balance FROM users WHERE id = ?");
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
-
-// Welcome message logic
-$welcome_message = isset($_SESSION['welcome_message']) ? $_SESSION['welcome_message'] : '';
-unset($_SESSION['welcome_message']); // Remove after displaying
-
-// Fetch daily returns
-$sql = "SELECT dr.*, u.full_name, i.amount 
-        FROM daily_returns dr
-        JOIN users u ON dr.user_id = u.id
-        JOIN investments i ON dr.investment_id = i.id
-        WHERE dr.user_id = ?
-        ORDER BY dr.created_at DESC
-        LIMIT 5";  // Fetch only the latest 5 records
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$user_id]);
-$dailyReturns = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Calculate total investment
-$totalInvestmentStmt = $pdo->prepare("SELECT SUM(amount) AS total_investment FROM investments WHERE user_id = ?");
-$totalInvestmentStmt->execute([$user_id]);
-$totalInvestment = $totalInvestmentStmt->fetch(PDO::FETCH_ASSOC)['total_investment'];
-
-// Calculate total profit
-$totalProfitStmt = $pdo->prepare("SELECT SUM(return_amount) AS total_profit FROM daily_returns WHERE user_id = ?");
-$totalProfitStmt->execute([$user_id]);
-$totalProfit = $totalProfitStmt->fetch(PDO::FETCH_ASSOC)['total_profit'];
 ?>
+
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Trade Bot</title>
+    <title>Starter Portfolio - Invest Now</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
-                    }
-                }
-            }
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-900 text-white">
-    <header class="bg-gray-800 shadow-lg">
-        <nav class="container mx-auto px-4 sm:px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="text-xl font-bold">AI Trade Bot</div>
-                <div class="hidden md:flex space-x-4 item-center justify-center">
-                    <a href="#" class="hover:text-primary-400">Dashboard</a>
-                    <a href="#" class="hover:text-primary-400">Trades</a>
-                    <a href="#" class="hover:text-primary-400">Deposit</a>
-                    <a href="investment.php" class="hover:text-primary-400">Investment Plan</a>
-                    <a href="#" class="hover:text-primary-400">Settings</a>
-                    <a href="logout.php" class="inline-flex items-center justify-center rounded-full bg-[#FBC531] px-4 py-2 text-sm font-medium text-black hover:bg-neon/90 focus:outline-none focus:ring-2 focus:ring-neon/50">Logout</a>
-                </div>
+<header class="flex justify-between items-center p-4">
+            <h1 class="text-xl font-semibold">Starter Portfolio</h1>
+            <div class="flex items-center">
+            <p>Your Balance: <span class="font-bold">$<?= number_format($user['balance'], 2) ?></span></p>
+                <span class="mr-4">Welcome, <?= htmlspecialchars($user['username']) ?></span>
+                <form action="logout.php" method="post">
+                    <button type="submit" class="bg-[#FBC531] text-black pl-4 pr-4 pt-2 pb-2 rounded-full flex items-center">
+                        Logout
+                        <i class="ri-logout-box-r-line ml-2"></i>
+                    </button>
+                </form>
             </div>
-        </nav>
-    </header>
+        </header>
+    <!-- <header class="p-4">
+        <h1 class="text-2xl font-semibold">Starter Portfolio</h1>
+        <p>Welcome, <?= htmlspecialchars($user['full_name']) ?></p>
+        <p>Your Balance: <span class="font-bold">$<?= number_format($user['balance'], 2) ?></span></p>
+    </header> -->
 
-    <main class="container mx-auto px-4 sm:px-6 py-8">
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="md:col-span-2">
-                <!-- Trading chart -->
-                <div class="bg-gray-800 h-[450px] pb-[70px] rounded-lg shadow-xl pt-4 pl-4 pr-4 sm:p-6 mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold mb-4">Trading Chart</h2>
-                    <!-- TradingView Widget -->
-                    <div class="tradingview-widget-container w-full h-64 sm:h-96 rounded-lg mb-4">
-                        <div class="tradingview-widget-container__widget h-full w-full"></div>
-                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                            {
-                                "autosize": true,
-                                "symbol": "NASDAQ:AAPL",
-                                "timezone": "Etc/UTC",
-                                "theme": "dark",
-                                "style": "1",
-                                "locale": "en",
-                                "withdateranges": true,
-                                "range": "YTD",
-                                "hide_side_toolbar": false,
-                                "allow_symbol_change": true,
-                                "details": true,
-                                "hotlist": true,
-                                "calendar": false,
-                                "show_popup_button": true,
-                                "popup_width": "1000",
-                                "popup_height": "650",
-                                "support_host": "https://www.tradingview.com"
-                            }
-                        </script>
-                    </div>
-                </div>
+    <main class="p-4">
+        <?php if (isset($error)): ?>
+            <div class="bg-red-500 text-white p-3 rounded"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <?php if (isset($success)): ?>
+            <div class="bg-green-500 text-white p-3 rounded"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
 
-                <!-- Daily Investment Returns -->
-                <div class="bg-gray-800 rounded-lg shadow-xl p-4 sm:p-6 mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold mb-4">Daily Investment Returns</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-left text-gray-400">
-                            <thead class="text-xs uppercase bg-gray-700">
-                                <tr>
-                                    <th class="px-4 py-3 sm:px-6">Investor</th>
-                                    <th class="px-4 py-3 sm:px-6">Investment Amount</th>
-                                    <th class="px-4 py-3 sm:px-6">Daily Return</th>
-                                    <th class="px-4 py-3 sm:px-6">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($dailyReturns as $return): ?>
-                                    <tr class="border-b border-gray-700">
-                                        <td class="px-4 py-3 sm:px-6"><?= htmlspecialchars($return['full_name']) ?></td>
-                                        <td class="px-4 py-3 sm:px-6">$<?= number_format($return['amount'], 2) ?></td>
-                                        <td class="px-4 py-3 sm:px-6 text-green-500">$<?= number_format($return['return_amount'], 2) ?></td>
-                                        <td class="px-4 py-3 sm:px-6"><?= date('M d, Y', strtotime($return['created_at'])) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="md:col-span-1">
-                <!-- Performance Overview -->
-                <div class="bg-gray-800 rounded-lg shadow-xl p-4 sm:p-6 mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold mb-4">Performance</h2>
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">💰 Balance</span>
-                            <span class="font-bold text-green-500">$<?php echo number_format($user['balance'], 2); ?></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Total Investment</span>
-                            <span class="font-bold text-green-500">$<?php echo number_format($totalInvestment, 2); ?></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Total Profit</span>
-                            <span class="font-bold text-green-500">+$<?php echo number_format($totalProfit, 2); ?></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Win Rate</span>
-                            <span class="font-bold">68%</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-400">Total Trades</span>
-                            <span class="font-bold">1,234</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="bg-gray-800 p-6 rounded">
+            <h2 class="text-2xl font-bold"><?= htmlspecialchars($portfolio['name']) ?></h2>
+            <p>Investment Range: $<?= number_format($portfolio['min_investment']) ?> - $<?= number_format($portfolio['max_investment']) ?></p>
+            <p>Weekly Return Rate: <?= $portfolio['weekly_return'] ?>%</p>
         </div>
+
+        <form method="post" class="mt-4 bg-gray-800 p-6 rounded">
+            <label for="investmentAmount" class="block text-sm">Investment Amount ($)</label>
+            <input type="number" id="investmentAmount" name="investmentAmount" min="<?= $portfolio['min_investment'] ?>" max="<?= min($portfolio['max_investment'], $user['balance']) ?>" step="100" class="w-full p-2 rounded bg-gray-700 text-white" required>
+
+            <button type="submit" name="invest" class="w-full mt-4 bg-yellow-500 text-black font-bold py-2 rounded">
+                Invest Now
+            </button>
+        </form>
+
+        <h2 class="mt-6 text-xl font-semibold">Investment History</h2>
+        <canvas id="investmentChart" class="bg-gray-800 p-4 rounded"></canvas>
     </main>
-
-    <footer class="bg-gray-800 mt-12">
-        <div class="container mx-auto px-4 sm:px-6 py-4">
-            <p class="text-center text-gray-400">&copy; 2025 AI Trade Bot. All rights reserved.</p>
-        </div>
-    </footer>
-
+    <footer class="bg-zinc-900 border-t border-zinc-800 p-2">
+            <div class="grid grid-cols-5 gap-2">
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-home-line text-xl"></i>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-line-chart-line text-xl"></i>
+                    <span class="text-xs">Markets</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-exchange-line text-xl"></i>
+                    <span class="text-xs">Trade</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-wallet-3-line text-xl"></i>
+                    <span class="text-xs">Earn</span>
+                </button>
+                <button class="flex flex-col items-center text-amber-500">
+                    <i class="ri-funds-box-line text-xl"></i>
+                    <span class="text-xs">Invest</span>
+                </button>
+            </div>
+        </footer>
     <script>
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
+        const ctx = document.getElementById('investmentChart').getContext('2d');
+        const investmentData = {
+            labels: [<?php foreach ($investments as $inv) { echo "'" . date("M d", strtotime($inv['investment_date'])) . "', "; } ?>],
+            datasets: [{
+                label: 'Investment Amount ($)',
+                data: [<?php foreach ($investments as $inv) { echo $inv['amount'] . ", "; } ?>],
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 2
+            }]
+        };
 
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('hidden');
-        });
-
-        closeMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
+        new Chart(ctx, {
+            type: 'line',
+            data: investmentData,
+            options: { responsive: true }
         });
     </script>
+
 </body>
 </html>
