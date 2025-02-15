@@ -16,200 +16,113 @@ $welcome_message = isset($_SESSION['welcome_message']) ? $_SESSION['welcome_mess
 unset($_SESSION['welcome_message']); // Remove after displaying
 ?>
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Trade Bot</title>
+    <title>Investment Plans</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        neon: '#C1FF00',
-                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white">
-    <header class="bg-gray-800 shadow-lg">
-        <nav class="container mx-auto px-4 sm:px-6 py-3">
-            <div class="flex items-center justify-between">
-                <div class="text-xl font-bold">AI Trade Bot</div>
-                <div class="hidden md:flex space-x-4 item-center justify-center">
-                    <a href="index.php" class="hover:text-primary-400">Dashboard</a>
-                    <a href="#" class="hover:text-primary-400">Trades</a>
-                    <a href="#" class="hover:text-primary-400">Deposit</a>
-                    <a href="investment.php" class="hover:text-primary-400">Investment Plan</a>
-                    <a href="#" class="hover:text-primary-400">Settings</a>
-                    <a href="logout.php" class="inline-flex items-center justify-center rounded-full bg-[#FBC531] px-4 py-2 text-sm font-medium text-black hover:bg-neon/90 focus:outline-none focus:ring-2 focus:ring-neon/50">Logout</a>
+<body class="bg-black text-white h-full flex flex-col">
+    <div class="min-h-screen bg-black text-white flex flex-col">
+        <header class="flex justify-between items-center p-4">
+            <h1 class="text-xl font-semibold">Investment Plans</h1>
+            <button class="bg-[#FBC531] text-black pl-4 pr-4 pt-2 pb-2 rounded-full flex items-center">
+                Logout
+                <i class="ri-logout-box-r-line ml-2"></i>
+            </button>
+        </header>
+
+        <main class="flex-grow p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Plan 1 -->
+                <div class="bg-zinc-800 p-6 rounded-xl flex flex-col">
+                    <h2 class="text-xl font-bold mb-2">Starter Portfolio</h2>
+                    <p class="text-gray-400 mb-4">$1,000 - $10,000</p>
+                    <ul class="flex-grow mb-4">
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Weekly Return: 2.5%</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Access to Blue-chip Stocks</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Weekly Market Reports</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Basic Portfolio Rebalancing</li>
+                    </ul>
+                    <button class="bg-[#FBC531] text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition duration-300">
+                        Start Investing
+                    </button>
                 </div>
-                <!-- Mobile menu button -->
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-gray-300 hover:text-white focus:outline-none focus:text-white">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg>
+
+                <!-- Plan 2 -->
+                <div class="bg-zinc-800 p-6 rounded-xl flex flex-col">
+                    <h2 class="text-xl font-bold mb-2">Growth Portfolio</h2>
+                    <p class="text-gray-400 mb-4">$10,000 - $50,000</p>
+                    <ul class="flex-grow mb-4">
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Weekly Return: 4%</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Diversified Stock Selection</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Bi-weekly Strategy Calls</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Dividend Reinvestment Option</li>
+                    </ul>
+                    <button class="bg-[#FBC531] text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition duration-300">
+                        Start Investing
+                    </button>
+                </div>
+
+                <!-- Plan 3 -->
+                <div class="bg-zinc-800 p-6 rounded-xl flex flex-col">
+                    <h2 class="text-xl font-bold mb-2">Advanced Portfolio</h2>
+                    <p class="text-gray-400 mb-4">$50,000 - $100,000</p>
+                    <ul class="flex-grow mb-4">
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Weekly Return: 6%</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Access to IPOs</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Personalized Investment Strategy</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Quarterly 1-on-1 Advisor Meeting</li>
+                    </ul>
+                    <button class="bg-[#FBC531] text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition duration-300">
+                        Start Investing
+                    </button>
+                </div>
+
+                <!-- Plan 4 -->
+                <div class="bg-zinc-800 p-6 rounded-xl flex flex-col">
+                    <h2 class="text-xl font-bold mb-2">Premium Portfolio</h2>
+                    <p class="text-gray-400 mb-4">$100,000 and above</p>
+                    <ul class="flex-grow mb-4">
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Weekly Return: 8%</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Exclusive High-growth Stocks</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>24/7 Dedicated Account Manager</li>
+                        <li class="mb-2"><i class="ri-check-line text-green-500 mr-2"></i>Tax-efficient Investment Structuring</li>
+                    </ul>
+                    <button class="bg-[#FBC531] text-black font-bold py-2 px-4 rounded-full hover:bg-yellow-500 transition duration-300">
+                        Start Investing
                     </button>
                 </div>
             </div>
-        </nav>
-    </header>
+        </main>
 
-    <!-- Mobile menu -->
-    <div id="mobile-menu" class="fixed inset-y-0 left-0 w-64 bg-gray-800 z-50 transform -translate-x-full transition duration-200 ease-in-out md:hidden">
-        <div class="p-6">
-            <button id="close-menu-button" class="absolute top-3 right-3 text-gray-300 hover:text-white">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-            <nav class="mt-8 space-y-4">
-                <a href="index.php" class="block text-gray-300 hover:text-white">Dashboard</a>
-                <a href="#" class="block text-gray-300 hover:text-white">Trades</a>
-                <a href="#" class="block text-gray-300 hover:text-white">Deposit</a>
-                <a href="#" class="block text-gray-300 hover:text-white">Investment Plan</a>
-                <a href="#" class="block text-gray-300 hover:text-white">Settings</a>
-                <a href="logout.php" class="inline-flex items-center justify-center rounded-full bg-[#FBC531] px-4 py-2 text-sm font-medium text-black hover:bg-neon/90 focus:outline-none focus:ring-2 focus:ring-neon/50">Logout</a>
-            </nav>
-        </div>
+        <footer class="bg-zinc-900 border-t border-zinc-800 p-2">
+            <div class="grid grid-cols-5 gap-2">
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-home-line text-xl"></i>
+                    <span class="text-xs">Home</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-line-chart-line text-xl"></i>
+                    <span class="text-xs">Markets</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-exchange-line text-xl"></i>
+                    <span class="text-xs">Trade</span>
+                </button>
+                <button class="flex flex-col items-center text-gray-400 hover:text-white">
+                    <i class="ri-wallet-3-line text-xl"></i>
+                    <span class="text-xs">Earn</span>
+                </button>
+                <button class="flex flex-col items-center text-amber-500">
+                    <i class="ri-funds-box-line text-xl"></i>
+                    <span class="text-xs">Invest</span>
+                </button>
+            </div>
+        </footer>
     </div>
-
-    <main class="container mx-auto px-4 sm:px-6 py-8">
-       <!--investment plan-->
-        <!--plan section price-->
-        
-        <section class="py-20">
-                <div class="text-center mb-16">
-                    <h2 class="text-3xl sm:text-4xl font-bold mb-4">
-                        Choose Your <span class="text-primary">Stock Investment</span> Plan
-                    </h2>
-                    <p class="text-gray-600 max-w-2xl mx-auto">
-                        Select the plan that aligns with your investment goals. Our tiered system offers increasing weekly returns based on your investment amount, backed by expert stock market analysis.
-                    </p>
-                </div>
-    
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200">
-                        <h3 class="text-2xl font-bold mb-2">Plan 1</h3>
-                        <p class="text-lg text-gray-600 mb-4">Starter Portfolio</p>
-                        <div class="text-3xl font-bold mb-4">$1,000 - $10,000</div>
-                        <div class="text-xl mb-4">Weekly Return: <span class="font-semibold text-primary">2.5%</span></div>
-                        <ul class="mb-6 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Access to Blue-chip Stocks
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Weekly Market Reports
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Basic Portfolio Rebalancing
-                            </li>
-                        </ul>
-                        <a href="investment_plan1.php" class="block w-full text-center py-2 px-4 bg-white text-neon border border-neon rounded hover:bg-neon hover:text-white transition duration-300">Start Investing</a>
-                    </div>
-    
-                    <div class="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200">
-                        <h3 class="text-2xl font-bold mb-2">Plan 2</h3>
-                        <p class="text-lg text-gray-600 mb-4">Growth Portfolio</p>
-                        <div class="text-3xl font-bold mb-4">$10,000 - $50,000</div>
-                        <div class="text-xl mb-4">Weekly Return: <span class="font-semibold text-primary">4%</span></div>
-                        <ul class="mb-6 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Diversified Stock Selection
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Bi-weekly Strategy Calls
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Dividend Reinvestment Option
-                            </li>
-                        </ul>
-                        <a href="investment_plan1.php" class="block w-full text-center py-2 px-4 bg-white text-neon border border-neon rounded hover:bg-neon hover:text-white transition duration-300">Start Investing</a>
-                    </div>
-    
-                    <div class="bg-gray-900 rounded-lg shadow-lg p-6 border-2 border-neon">
-                        <h3 class="text-2xl font-bold mb-2">Plan 3</h3>
-                        <p class="text-lg text-gray-600 mb-4">Advanced Portfolio</p>
-                        <div class="text-3xl font-bold mb-4">$50,000 - $100,000</div>
-                        <div class="text-xl mb-4">Weekly Return: <span class="font-semibold text-primary">6%</span></div>
-                        <ul class="mb-6 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Access to IPOs
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Personalized Investment Strategy
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Quarterly 1-on-1 Advisor Meeting
-                            </li>
-                        </ul>
-                        <a href="investment_plan1.php" class="block w-full text-center py-2 px-4 bg-neon text-white rounded hover:bg-neon-dark transition duration-300">Start Investing</a>
-                    </div>
-    
-                    <div class="bg-gray-900 rounded-lg shadow-md p-6 border border-gray-200">
-                        <h3 class="text-2xl font-bold mb-2">Plan 4</h3>
-                        <p class="text-lg text-gray-600 mb-4">Premium Portfolio</p>
-                        <div class="text-3xl font-bold mb-4">$100,000 and above</div>
-                        <div class="text-xl mb-4">Weekly Return: <span class="font-semibold text-primary">8%</span></div>
-                        <ul class="mb-6 space-y-2">
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Exclusive High-growth Stocks
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                24/7 Dedicated Account Manager
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-5 h-5 text-primary mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Tax-efficient Investment Structuring
-                            </li>
-                        </ul>
-                        <a href="investment_plan1.php" class="block w-full text-center py-2 px-4 bg-white text-neon border border-neon rounded hover:bg-neon hover:text-white transition duration-300">Start Investing</a>
-                    </div>
-                </div>
-    </section>
-    </main>
-
-    <footer class="bg-gray-800 mt-12">
-        <div class="container mx-auto px-4 sm:px-6 py-4">
-            <p class="text-center text-gray-400">&copy; 2025 AI Trade Bot. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const closeMenuButton = document.getElementById('close-menu-button');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        mobileMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('-translate-x-full');
-        });
-
-        closeMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.add('-translate-x-full');
-        });
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script>
-    <?php if ($welcome_message): ?>
-        toastr.success("<?= $welcome_message ?>");
-    <?php endif; ?>
-    </script>
 </body>
 </html>
+

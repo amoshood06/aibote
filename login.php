@@ -61,7 +61,8 @@
             }
         }
     </script>
-
+    <script src="./asset/toast/jquery-3.7.1.min.js"></script>
+    <script src="./asset/toast/toastr.min.js"></script>
     <!-- AJAX LOGIN REQUEST -->
     <script>
         $(document).ready(function () {

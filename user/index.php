@@ -64,6 +64,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crypto Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./asset/toast/toastr.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
@@ -72,15 +73,13 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
         <div class="min-h-screen bg-black text-white">
             <div class="flex justify-between items-center p-4">
                 <h1 class="text-xl font-semibold">My Assets</h1>
-                <a href="logout.php">
-                    <button class="bg-[#FBC531] pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex rounded-[20px]">
+                    <button id="logoutBtn" class="bg-[#FBC531] pl-[20px] pr-[20px] pt-[10px] pb-[10px] flex rounded-[20px]">
                         Logout
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                         <path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                         </svg>
 
                     </button>
-                </a>
             </div>
             <div class="p-4 space-y-2">
                 <div class="flex items-center gap-2">
@@ -245,5 +244,27 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                 </div>
             </div>
         </div>
+        <script src="../asset/toast/jquery-3.7.1.min.js"></script>
+    <script src="../asset/toast/toastr.min.js"></script>
+        <!-- AJAX Logout Script -->
+    <script>
+        $(document).ready(function () {
+            $("#logoutBtn").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "../logout.php",
+                    success: function (response) {
+                        toastr.success("You have been logged out!", "Logout Successful");
+                        setTimeout(() => {
+                            window.location.href = "../login.php";
+                        }, 2000);
+                    },
+                    error: function () {
+                        toastr.error("Something went wrong!", "Error");
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
