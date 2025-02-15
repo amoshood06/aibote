@@ -211,7 +211,7 @@ $btc_value = ($btc_rate > 0) ? ($user_balance / $btc_rate) : 0;
                                     </svg>
                                 <span class="text-xs text-gray-400">Home</span>
                             </button>
-                            <a href="markets.php">
+                            <a href="market-chart.php">
                                 <button class="flex flex-col items-center gap-1 py-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-line-chart w-5 h-5 text-gray-400">
                                         <path d="M3 3v18h18"></path>
