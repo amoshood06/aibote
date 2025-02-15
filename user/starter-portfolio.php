@@ -24,7 +24,7 @@ try {
     $user_id = $_SESSION['user_id'];
 
     // Prepare SQL statement to select username and balance
-    $stmt = $pdo->prepare("SELECT username, balance FROM users WHERE id = :user_id");
+    $stmt = $pdo->prepare("SELECT full_name, balance FROM users WHERE id = :user_id");
     $stmt->execute(['user_id' => $user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
